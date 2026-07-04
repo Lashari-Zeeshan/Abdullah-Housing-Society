@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="sd" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سوسائٽي رڪارڊ سسٽم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&family=Noto+Sans+Arabic:wght@400..700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#16223F;
+    --navy-2:#202f52;
+    --brass:#B08D57;
+    --brass-light:#D8BE8C;
+    --cream:#F6F1E4;
+    --paper:#FBF8EF;
+    --maroon:#7A2E2E;
+    --maroon-2:#9c3d3d;
+    --ink:#24304D;
+    --line:#C9BFA0;
+    --success:#3F6B4A;
+    --success-bg:#E7EFE8;
+    --danger:#7A2E2E;
+    --danger-bg:#F5E9E7;
+    --bg:#EDE8DC;
+    --card:#FFFFFF;
+    --shadow: 0 2px 10px rgba(22,34,63,0.08), 0 1px 2px rgba(22,34,63,0.06);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(circle at 100% 0%, rgba(176,141,87,0.10), transparent 40%),
+      radial-gradient(circle at 0% 100%, rgba(122,46,46,0.06), transparent 40%);
+    font-family:'Noto Sans Arabic','Scheherazade New',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+  }
+  h1,h2,h3,.brand,.slip-title{
+    font-family:'Noto Nastaliq Urdu','Scheherazade New',serif;
+    font-weight:700;
+  }
+  ::selection{background:var(--brass-light);}
+
+  /* ---------- layout ---------- */
+  .app-shell{
+    display:flex;
+    min-height:100vh;
+  }
+  .sidebar{
+    width:250px;
+    flex-shrink:0;
+    background:linear-gradient(180deg, var(--navy) 0%, var(--navy-2) 100%);
+    color:var(--cream);
+    padding:26px 18px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .brand-block{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:4px 6px 22px 6px;
+    border-bottom:1px solid rgba(216,190,140,0.25);
+    margin-bottom:18px;
+  }
+  .brand-mark{
+    width:46px;height:46px;border-radius:10px;
+    background:linear-gradient(135deg, var(--brass) 0%, var(--brass-light) 100%);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    box-shadow: inset 0 0 0 2px rgba(22,34,63,0.25);
+  }
+  .brand-mark svg{width:26px;height:26px;}
+  .brand-text .brand{font-size:19px;line-height:1.3;color:var(--cream);}
+  .brand-text .sub{font-size:11.5px;color:var(--brass-light);letter-spacing:.3px;}
+
+  .nav-item{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 14px;border-radius:10px;
+    color:rgba(246,241,228,0.82);
+    cursor:pointer;font-size:15.5px;
+    transition:background .15s ease, color .15s ease;
+    user-select:none;
+  }
+  .nav-item svg{width:19px;height:19px;flex-shrink:0;opacity:.85;}
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .nav-item.active{
+    background:rgba(216,190,140,0.16);
+    color:#fff;
+    box-shadow: inset 3px 0 0 var(--brass);
+  }
+  .nav-divider{height:1px;background:rgba(216,190,140,0.18);margin:10px 4px;}
+  .sidebar-footer{
+    margin-top:auto;
+    font-size:11px;
+    color:rgba(246,241,228,0.45);
+    padding:10px 6px 0 6px;
+    border-top:1px solid rgba(216,190,140,0.18);
+  }
+
+  .main{
+    flex:1;
+    min-width:0;
+    padding:28px 34px 60px 34px;
+  }
+  .topbar{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:26px;
+    flex-wrap:wrap;
+    gap:14px;
+  }
+  .page-title{font-size:26px;margin:0 0 4px 0;color:var(--navy);}
+  .page-sub{font-size:13.5px;color:#6b6455;margin:0;}
+  .quick-search{
+    display:flex;align-items:center;gap:8px;
+    background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:9px 14px;min-width:280px;
+    box-shadow:var(--shadow);
+  }
+  .quick-search input{
+    border:none;outline:none;background:transparent;
+    font-family:inherit;font-size:14.5px;flex:1;color:var(--ink);
+  }
+  .quick-search svg{width:17px;height:17px;color:var(--brass);flex-shrink:0;}
+
+  /* ---------- cards / stats ---------- */
+  .stat-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;
+  }
+  @media(max-width:1000px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
+  .stat-card{
+    background:var(--card);border-radius:var(--radius);padding:18px 20px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;
+    border-top:3px solid var(--brass);
+  }
+  .stat-card .label{font-size:12.5px;color:#7a7360;margin-bottom:8px;}
+  .stat-card .value{font-size:24px;font-weight:700;color:var(--navy);}
+  .stat-card .value.maroon{color:var(--maroon);}
+  .stat-card .value.success{color:var(--success);}
+
+  .card{
+    background:var(--card);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:24px 26px;margin-bottom:22px;
+  }
+  .card h2{font-size:19px;margin:0 0 18px 0;color:var(--navy);
+    display:flex;align-items:center;gap:10px;}
+  .card h2 .num-badge{
+    width:28px;height:28px;border-radius:8px;background:var(--navy);color:var(--brass-light);
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-family:'Noto Sans Arabic';font-weight:700;
+  }
+
+  /* ---------- forms ---------- */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;}
+  @media(max-width:800px){.form-grid{grid-template-columns:1fr;}}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-size:13.5px;color:#5c5646;font-weight:700;}
+  .field input, .field select, .field textarea{
+    font-family:inherit;font-size:15px;padding:11px 13px;
+    border:1.5px solid var(--line);border-radius:9px;background:var(--paper);
+    color:var(--ink);outline:none;transition:border-color .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{
+    border-color:var(--brass);background:#fff;
+  }
+  .field.readonly input{background:#EFE9DA;color:#7a7360;font-weight:700;}
+  .field.span2{grid-column:span 2;}
+  @media(max-width:800px){.field.span2{grid-column:span 1;}}
+
+  .calc-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 4px;border-bottom:1px dashed var(--line);font-size:14.5px;
+  }
+  .calc-row:last-child{border-bottom:none;}
+  .calc-row .k{color:#6b6455;}
+  .calc-row .v{font-weight:700;color:var(--navy);}
+  .calc-row.total .v{color:var(--maroon);font-size:17px;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:11px 22px;border-radius:9px;border:none;cursor:pointer;
+    font-family:inherit;font-size:15px;font-weight:700;
+    transition:transform .1s ease, box-shadow .15s ease;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--navy);color:#fff;box-shadow:var(--shadow);}
+  .btn-primary:hover{background:var(--navy-2);}
+  .btn-brass{background:linear-gradient(135deg,var(--brass),var(--brass-light));color:var(--navy);box-shadow:var(--shadow);}
+  .btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--navy);}
+  .btn-outline:hover{background:rgba(22,34,63,0.05);}
+  .btn-danger{background:transparent;color:var(--maroon);border:1.5px solid var(--maroon);}
+  .btn-danger:hover{background:var(--danger-bg);}
+  .btn-row{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  /* ---------- table ---------- */
+  table{width:100%;border-collapse:collapse;font-size:14.5px;}
+  th{
+    text-align:right;padding:11px 12px;background:var(--navy);color:var(--brass-light);
+    font-size:13px;font-weight:700;position:sticky;top:0;
+  }
+  th:first-child{border-radius:8px 0 0 8px;}
+  th:last-child{border-radius:0 8px 8px 0;}
+  td{padding:12px;border-bottom:1px solid #EDE7D6;}
+  tr:hover td{background:#FAF6EA;}
+  .row-clickable{cursor:pointer;}
+  .badge{
+    display:inline-block;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700;
+  }
+  .badge.paid{background:var(--success-bg);color:var(--success);}
+  .badge.pending{background:var(--danger-bg);color:var(--maroon);}
+  .badge.method-cash{background:#EFE9DA;color:#7a6a3a;}
+  .badge.method-cheque{background:#E4E9F2;color:var(--navy);}
+  .empty-state{
+    text-align:center;padding:50px 20px;color:#8a8370;
+  }
+  .empty-state svg{width:52px;height:52px;color:var(--brass-light);margin-bottom:10px;}
+
+  /* ---------- customer detail ---------- */
+  .detail-header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;}
+  .detail-name{font-size:23px;color:var(--navy);margin:0;}
+  .detail-sub{font-size:13.5px;color:#7a7360;margin-top:4px;}
+  .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 24px;margin-top:18px;}
+  @media(max-width:900px){.info-grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.info-grid{grid-template-columns:1fr;}}
+  .info-item .k{font-size:12px;color:#8a8370;margin-bottom:3px;}
+  .info-item .v{font-size:15px;font-weight:700;color:var(--ink);}
+  .progress-wrap{margin-top:20px;}
+  .progress-bar{height:10px;border-radius:6px;background:#EDE7D6;overflow:hidden;margin-top:6px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--brass),var(--success));border-radius:6px;}
+
+  /* ---------- pay slip ---------- */
+  .slip-wrap{display:flex;justify-content:center;}
+  .slip{
+    width:640px;max-width:100%;
+    background:var(--paper);
+    border:2px solid var(--navy);
+    border-radius:6px;
+    position:relative;
+    padding:26px 30px 22px 30px;
+    box-shadow:var(--shadow);
+  }
+  .slip::before{
+    content:"";position:absolute;inset:8px;border:1px dashed var(--brass);border-radius:4px;pointer-events:none;
+  }
+  .slip-head{
+    display:flex;justify-content:space-between;align-items:center;
+    border-bottom:2px solid var(--navy);padding-bottom:12px;margin-bottom:14px;
+  }
+  .slip-title{font-size:22px;color:var(--navy);margin:0;}
+  .slip-head .meta{text-align:left;font-size:13px;}
+  .slip-head .meta .k{color:#8a8370;}
+  .slip-head .meta .v{font-weight:700;color:var(--maroon);font-size:16px;}
+  .slip-section-title{
+    font-size:13px;color:var(--brass);font-weight:700;margin:14px 0 6px 0;
+    border-bottom:1px dashed var(--line);padding-bottom:4px;
+  }
+  .slip-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;font-size:14px;}
+  .slip-grid .row{display:flex;justify-content:space-between;border-bottom:1px dotted var(--line);padding:4px 0;}
+  .slip-grid .row .k{color:#6b6455;}
+  .slip-grid .row .v{font-weight:700;}
+  .slip-amount-box{
+    margin-top:14px;background:#fff;border:1.5px solid var(--maroon);border-radius:8px;
+    padding:12px 16px;display:flex;justify-content:space-between;align-items:center;
+  }
+  .slip-amount-box .k{font-size:14px;color:var(--maroon);font-weight:700;}
+  .slip-amount-box .v{font-size:22px;color:var(--maroon);font-weight:700;}
+  .slip-sign-row{display:flex;justify-content:space-between;margin-top:38px;padding-top:8px;}
+  .sign-block{text-align:center;width:45%;}
+  .sign-line{border-top:1.5px solid var(--ink);margin-bottom:6px;}
+  .sign-label{font-size:12.5px;color:#6b6455;}
+  .stamp-circle{
+    width:64px;height:64px;border-radius:50%;border:2px dashed var(--brass);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 8px auto;
+    font-size:10px;color:var(--brass);text-align:center;
+  }
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--navy);color:#fff;padding:13px 26px;border-radius:10px;
+    box-shadow:var(--shadow);font-size:14.5px;z-index:999;
+    display:flex;align-items:center;gap:10px;
+    opacity:0;pointer-events:none;transition:opacity .25s ease, bottom .25s ease;
+  }
+  .toast.show{opacity:1;bottom:34px;}
+  .toast svg{width:18px;height:18px;color:var(--success);flex-shrink:0;}
+
+  .search-results{margin-top:10px;}
+  .search-hit{
+    padding:10px 14px;border:1px solid var(--line);border-radius:9px;margin-bottom:8px;
+    display:flex;justify-content:space-between;align-items:center;cursor:pointer;background:#fff;
+  }
+  .search-hit:hover{border-color:var(--brass);}
+  .search-hit .name{font-weight:700;}
+  .search-hit .meta{font-size:12.5px;color:#8a8370;}
+
+  @media print{
+    body *{visibility:hidden;}
+    .print-area, .print-area *{visibility:visible;}
+    .print-area{position:absolute;top:0;left:0;width:100%;}
+    .slip{box-shadow:none;border:2px solid #000;}
+    .slip::before{border-color:#999;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand-block">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#16223F" stroke-width="2"><path d="M3 11L12 4l9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+      </div>
+      <div class="brand-text">
+        <div class="brand">سوسائٽي رڪارڊ</div>
+        <div class="sub">پلاٽ ۽ گراهڪ مئنيجمينٽ</div>
+      </div>
+    </div>
+
+    <div class="nav-item" data-view="dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+      <span>ڊيش بورڊ</span>
+    </div>
+    <div class="nav-item" data-view="newCustomer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+      <span>نئون گراهڪ داخل ڪريو</span>
+    </div>
+    <div class="nav-item" data-view="customers">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>سڀ گراهڪ</span>
+    </div>
+    <div class="nav-item" data-view="payInstallment">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      <span>قسط ادا ڪريو</span>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-item" data-view="allPayments">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+      <span>سموريون رسيدون</span>
+    </div>
+
+    <div class="sidebar-footer">© سوسائٽي رڪارڊ سسٽم</div>
+  </aside>
+
+  <main class="main" id="app"></main>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+/* =====================  STORAGE / STATE  ===================== */
+let customers = [];
+let payments = [];
+let slipCounter = 1001;
+let currentView = 'dashboard';
+let currentCustomerId = null;
+let searchTerm = '';
+let editingCustomerId = null;
+let lastSlipPaymentId = null;
+
+const app = document.getElementById('app');
+
+function fmt(n){
+  n = Number(n)||0;
+  return n.toLocaleString('en-US', {maximumFractionDigits:0});
+}
+function todayStr(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+function uid(){ return 'c_' + Date.now() + '_' + Math.floor(Math.random()*10000); }
+
+async function loadState(){
+  try{
+    const c = await window.storage.get('customers');
+    customers = c ? JSON.parse(c.value) : [];
+  }catch(e){ customers = []; }
+  try{
+    const p = await window.storage.get('payments');
+    payments = p ? JSON.parse(p.value) : [];
+  }catch(e){ payments = []; }
+  try{
+    const s = await window.storage.get('slipCounter');
+    slipCounter = s ? JSON.parse(s.value) : 1001;
+  }catch(e){ slipCounter = 1001; }
+}
+async function saveCustomers(){
+  try{ await window.storage.set('customers', JSON.stringify(customers)); }catch(e){ showToast('محفوظ ٿيڻ ۾ مسئلو پيش آيو'); }
+}
+async function savePayments(){
+  try{ await window.storage.set('payments', JSON.stringify(payments)); }catch(e){ showToast('محفوظ ٿيڻ ۾ مسئلو پيش آيو'); }
+}
+async function saveSlipCounter(){
+  try{ await window.storage.set('slipCounter', JSON.stringify(slipCounter)); }catch(e){}
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* =====================  DERIVED DATA HELPERS  ===================== */
+function customerPayments(cid){
+  return payments.filter(p=>p.customerId===cid).sort((a,b)=> new Date(b.date)-new Date(a.date));
+}
+function totalPaid(cid){
+  return customerPayments(cid).reduce((s,p)=>s+Number(p.amount||0),0);
+}
+function balanceOf(c){
+  return Math.max(0, Number(c.totalAmount||0) - totalPaid(c.id));
+}
+function totalCollectedAll(){
+  return payments.reduce((s,p)=>s+Number(p.amount||0),0);
+}
+function totalDueAll(){
+  return customers.reduce((s,c)=>s+balanceOf(c),0);
+}
+function todaysCollection(){
+  const t = todayStr();
+  return payments.filter(p=>p.date===t).reduce((s,p)=>s+Number(p.amount||0),0);
+}
+
+/* =====================  ROUTER / NAV  ===================== */
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    currentView = el.dataset.view;
+    if(currentView==='payInstallment'){ currentCustomerId=null; }
+    render();
+  });
+});
+
+function setActiveNav(){
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.classList.toggle('active', el.dataset.view===currentView);
+  });
+}
+
+/* =====================  RENDER: DASHBOARD  ===================== */
+function renderDashboard(){
+  const recent = [...payments].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+  return `
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">ڊيش بورڊ</h1>
+      <p class="page-sub">سوسائٽي جي سموري رڪارڊ جو مختصر جائزو</p>
+    </div>
+    ${quickSearchHtml()}
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="label">ڪل گراهڪ</div><div class="value">${fmt(customers.length)}</div></div>
+    <div class="stat-card"><div class="label">ڪل وصول ٿيل رقم</div><div class="value success">${fmt(totalCollectedAll())}</div></div>
+    <div class="stat-card"><div class="label">ڪل باقي رقم</div><div class="value maroon">${fmt(totalDueAll())}</div></div>
+    <div class="stat-card"><div class="label">اڄوڪي وصولي</div><div class="value">${fmt(todaysCollection())}</div></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num-badge">↺</span> تازيون رسيدون</h2>
+    ${recent.length ? renderPaymentsTable(recent, true) : emptyState('اڃا ڪا به رسيد داخل نه ٿي آهي')}
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-brass" onclick="goto('newCustomer')">＋ نئون گراهڪ داخل ڪريو</button>
+    <button class="btn btn-primary" onclick="goto('payInstallment')">قسط ادا ڪريو</button>
+  </div>
+  `;
+}
+
+function quickSearchHtml(){
+  return `
+  <div class="quick-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input id="globalSearch" placeholder="نالو، سي اين آءِ سي يا پلاٽ نمبر سان ڳوليو..." oninput="onGlobalSearch(this.value)" value="${escapeHtml(searchTerm)}">
+  </div>`;
+}
+
+function onGlobalSearch(val){
+  searchTerm = val;
+  currentView='customers';
+  render(true);
+  setTimeout(()=>{
+    const el = document.getElementById('globalSearch');
+    if(el){ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  },0);
+}
+
+function emptyState(msg){
+  return `<div class="empty-state">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6M9 16h6M9 8h6M5 21h14a2 2 0 0 0 2-2V7l-5-5H5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2z"/></svg>
+    <div>${msg}</div>
+  </div>`;
+}
+
+/* =====================  RENDER: NEW / EDIT CUSTOMER  ===================== */
+function renderCustomerForm(){
+  const editing = editingCustomerId ? customers.find(c=>c.id===editingCustomerId) : null;
+  const c = editing || {
+    name:'',father:'',caste:'',address:'',cnic:'',mobile:'',plotNumber:'',
+    totalArea:'',ratePerFt:'',regDate:todayStr(),initialAmount:'',method:'cash'
+  };
+  return `
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">${editing? 'گراهڪ جي معلومات تبديل ڪريو' : 'نئون گراهڪ داخل ڪريو'}</h1>
+      <p class="page-sub">هيٺ ڏنل سموري معلومات احتياط سان ڀريو</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num-badge">1</span> ذاتي ۽ رابطي جي معلومات</h2>
+    <div class="form-grid">
+      <div class="field"><label>نالو</label><input id="f_name" value="${escapeHtml(c.name)}" placeholder="مثال: علي احمد"></div>
+      <div class="field"><label>پيءُ جو نالو</label><input id="f_father" value="${escapeHtml(c.father)}"></div>
+      <div class="field"><label>ذات</label><input id="f_caste" value="${escapeHtml(c.caste)}"></div>
+      <div class="field"><label>موبائل نمبر</label><input id="f_mobile" value="${escapeHtml(c.mobile)}" placeholder="03XXXXXXXXX"></div>
+      <div class="field"><label>شناختي ڪارڊ نمبر (CNIC)</label><input id="f_cnic" value="${escapeHtml(c.cnic)}" placeholder="XXXXX-XXXXXXX-X"></div>
+      <div class="field"><label>رجسٽريشن تاريخ</label><input id="f_regDate" type="date" value="${c.regDate||todayStr()}"></div>
+      <div class="field span2"><label>پتو</label><textarea id="f_address" rows="2">${escapeHtml(c.address)}</textarea></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num-badge">2</span> پلاٽ ۽ رقم جي تفصيل</h2>
+    <div class="form-grid">
+      <div class="field"><label>پلاٽ نمبر</label><input id="f_plot" value="${escapeHtml(c.plotNumber)}"></div>
+      <div class="field"><label>ڪل ايراضي (چورس فوٽ)</label><input id="f_area" type="number" min="0" value="${c.totalArea}" oninput="updateCalcPreview()"></div>
+      <div class="field"><label>في چورس فوٽ اگهه (رپيا)</label><input id="f_rate" type="number" min="0" value="${c.ratePerFt}" oninput="updateCalcPreview()"></div>
+      <div class="field"><label>شروعاتي رقم (اختياري)</label><input id="f_initial" type="number" min="0" value="${c.initialAmount||''}" placeholder="جيڪڏهن ڪا رقم اڳ ۾ ملي هجي"></div>
+    </div>
+
+    <div style="margin-top:18px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px;">
+      <div class="calc-row"><span class="k">پلاٽ جي اصل قيمت</span><span class="v" id="calc_actual">0</span></div>
+      <div class="calc-row"><span class="k">ترقياتي خرچ (15%)</span><span class="v" id="calc_dev">0</span></div>
+      <div class="calc-row total"><span class="k">ڪل رقم</span><span class="v" id="calc_total">0</span></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="saveCustomer()">💾 محفوظ ڪريو</button>
+    <button class="btn btn-outline" onclick="cancelForm()">رد ڪريو</button>
+  </div>
+  `;
+}
+
+function updateCalcPreview(){
+  const area = Number(document.getElementById('f_area').value)||0;
+  const rate = Number(document.getElementById('f_rate').value)||0;
+  const actual = area*rate;
+  const dev = actual*0.15;
+  const total = actual+dev;
+  document.getElementById('calc_actual').textContent = fmt(actual);
+  document.getElementById('calc_dev').textContent = fmt(dev);
+  document.getElementById('calc_total').textContent = fmt(total);
+}
+
+async function saveCustomer(){
+  const name = document.getElementById('f_name').value.trim();
+  const plot = document.getElementById('f_plot').value.trim();
+  if(!name){ showToast('مهرباني ڪري گراهڪ جو نالو داخل ڪريو'); return; }
+  if(!plot){ showToast('مهرباني ڪري پلاٽ نمبر داخل ڪريو'); return; }
+
+  const area = Number(document.getElementById('f_area').value)||0;
+  const rate = Number(document.getElementById('f_rate').value)||0;
+  const actual = area*rate;
+  const dev = actual*0.15;
+  const total = actual+dev;
+  const initial = Number(document.getElementById('f_initial').value)||0;
+
+  const data = {
+    name, father:document.getElementById('f_father').value.trim(),
+    caste:document.getElementById('f_caste').value.trim(),
+    address:document.getElementById('f_address').value.trim(),
+    cnic:document.getElementById('f_cnic').value.trim(),
+    mobile:document.getElementById('f_mobile').value.trim(),
+    plotNumber:plot,
+    totalArea:area, ratePerFt:rate,
+    plotAmount:actual, development:dev, totalAmount:total,
+    regDate:document.getElementById('f_regDate').value||todayStr()
+  };
+
+  if(editingCustomerId){
+    const idx = customers.findIndex(c=>c.id===editingCustomerId);
+    customers[idx] = {...customers[idx], ...data};
+    await saveCustomers();
+    showToast('گراهڪ جي معلومات تبديل ٿي وئي');
+    currentCustomerId = editingCustomerId;
+    editingCustomerId = null;
+    currentView='customerDetail';
+    render();
+    return;
+  }
+
+  const id = uid();
+  customers.push({id, createdAt:Date.now(), ...data});
+  await saveCustomers();
+
+  if(initial>0){
+    const slipNumber = slipCounter++;
+    await saveSlipCounter();
+    const payment = {
+      id:uid(), customerId:id, slipNumber,
+      date:data.regDate||todayStr(), amount:initial,
+      method:'cash', type:'token', createdAt:Date.now()
+    };
+    payments.push(payment);
+    await savePayments();
+    lastSlipPaymentId = payment.id;
+    showToast('نئون گراهڪ محفوظ ٿي ويو ۽ رسيد تيار آهي');
+    currentView='slip'; currentCustomerId=id; render();
+    return;
+  }
+
+  showToast('نئون گراهڪ ڪاميابيءَ سان داخل ٿيو');
+  currentCustomerId = id;
+  currentView='customerDetail';
+  render();
+}
+
+function cancelForm(){
+  editingCustomerId = null;
+  currentView='customers';
+  render();
+}
+
+/* =====================  RENDER: CUSTOMERS LIST  ===================== */
+function filteredCustomers(){
+  if(!searchTerm.trim()) return customers;
+  const t = searchTerm.trim().toLowerCase();
+  return customers.filter(c=>
+    (c.name||'').toLowerCase().includes(t) ||
+    (c.cnic||'').toLowerCase().includes(t) ||
+    (c.plotNumber||'').toLowerCase().includes(t) ||
+    (c.mobile||'').toLowerCase().includes(t)
+  );
+}
+
+function renderCustomersList(){
+  const list = filteredCustomers();
+  return `
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">سڀ گراهڪ</h1>
+      <p class="page-sub">${fmt(customers.length)} گراهڪ رجسٽرڊ آهن</p>
+    </div>
+    ${quickSearchHtml()}
+  </div>
+
+  <div class="card">
+    ${list.length ? `
+    <table>
+      <thead><tr>
+        <th>نالو</th><th>پلاٽ نمبر</th><th>موبائل نمبر</th><th>ڪل رقم</th><th>باقي رقم</th><th>حالت</th>
+      </tr></thead>
+      <tbody>
+        ${list.map(c=>{
+          const bal = balanceOf(c);
+          return `<tr class="row-clickable" onclick="openCustomer('${c.id}')">
+            <td>${escapeHtml(c.name)}</td>
+            <td>${escapeHtml(c.plotNumber)}</td>
+            <td>${escapeHtml(c.mobile)}</td>
+            <td>${fmt(c.totalAmount)}</td>
+            <td>${fmt(bal)}</td>
+            <td>${bal<=0 ? '<span class="badge paid">مڪمل ادا</span>' : '<span class="badge pending">باقي</span>'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    ` : emptyState(searchTerm ? 'ڪو به گراهڪ نه مليو' : 'اڃا ڪوبه گراهڪ داخل نه ٿيو آهي')}
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-brass" onclick="goto('newCustomer')">＋ نئون گراهڪ داخل ڪريو</button>
+  </div>
+  `;
+}
+
+function openCustomer(id){
+  currentCustomerId = id;
+  currentView='customerDetail';
+  render();
+}
+
+/* =====================  RENDER: CUSTOMER DETAIL  ===================== */
+function renderCustomerDetail(){
+  const c = customers.find(x=>x.id===currentCustomerId);
+  if(!c){ currentView='customers'; return renderCustomersList(); }
+  const paid = totalPaid(c.id);
+  const bal = balanceOf(c);
+  const pct = c.totalAmount>0 ? Math.min(100, Math.round((paid/c.totalAmount)*100)) : 0;
+  const hist = customerPayments(c.id);
+
+  return `
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">گراهڪ جي تفصيل</h1>
+      <p class="page-sub">مڪمل رڪارڊ ۽ ادائيگيءَ جي تاريخ</p>
+    </div>
+    <div class="btn-row" style="margin-top:0;">
+      <button class="btn btn-outline" onclick="editCustomer('${c.id}')">✎ تبديلي ڪريو</button>
+      <button class="btn btn-primary" onclick="startPayment('${c.id}')">＋ قسط ادا ڪريو</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="detail-header">
+      <div>
+        <h2 class="detail-name" style="margin-bottom:2px;">${escapeHtml(c.name)}</h2>
+        <div class="detail-sub">پلاٽ نمبر: ${escapeHtml(c.plotNumber)} &nbsp;•&nbsp; رجسٽريشن: ${c.regDate||'-'}</div>
+      </div>
+      <div>${bal<=0 ? '<span class="badge paid">مڪمل ادا ٿيل</span>' : '<span class="badge pending">باقي رقم موجود</span>'}</div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item"><div class="k">پيءُ جو نالو</div><div class="v">${escapeHtml(c.father)||'-'}</div></div>
+      <div class="info-item"><div class="k">ذات</div><div class="v">${escapeHtml(c.caste)||'-'}</div></div>
+      <div class="info-item"><div class="k">موبائل نمبر</div><div class="v">${escapeHtml(c.mobile)||'-'}</div></div>
+      <div class="info-item"><div class="k">شناختي ڪارڊ نمبر</div><div class="v">${escapeHtml(c.cnic)||'-'}</div></div>
+      <div class="info-item"><div class="k">پتو</div><div class="v">${escapeHtml(c.address)||'-'}</div></div>
+      <div class="info-item"><div class="k">ڪل ايراضي</div><div class="v">${fmt(c.totalArea)} چورس فوٽ</div></div>
+      <div class="info-item"><div class="k">في چورس فوٽ اگهه</div><div class="v">${fmt(c.ratePerFt)} رپيا</div></div>
+      <div class="info-item"><div class="k">پلاٽ جي اصل قيمت</div><div class="v">${fmt(c.plotAmount)}</div></div>
+      <div class="info-item"><div class="k">ترقياتي خرچ (15%)</div><div class="v">${fmt(c.development)}</div></div>
+      <div class="info-item"><div class="k">ڪل رقم</div><div class="v">${fmt(c.totalAmount)}</div></div>
+      <div class="info-item"><div class="k">ادا ٿيل رقم</div><div class="v" style="color:var(--success);">${fmt(paid)}</div></div>
+      <div class="info-item"><div class="k">باقي رقم</div><div class="v" style="color:var(--maroon);">${fmt(bal)}</div></div>
+    </div>
+
+    <div class="progress-wrap">
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#7a7360;">
+        <span>ادائيگيءَ جي ترقي</span><span>${pct}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num-badge">⟳</span> ادائيگيءَ جي تاريخ</h2>
+    ${hist.length ? renderPaymentsTable(hist, false) : emptyState('اڃا ڪا به ادائيگي نه ٿي آهي')}
+  </div>
+  `;
+}
+
+function editCustomer(id){
+  editingCustomerId = id;
+  currentView='newCustomer';
+  render();
+}
+
+function renderPaymentsTable(list, showName){
+  return `
+  <table>
+    <thead><tr>
+      ${showName? '<th>گراهڪ</th>':''}
+      <th>رسيد نمبر</th><th>تاريخ</th><th>قسم</th><th>طريقو</th><th>رقم</th><th></th>
+    </tr></thead>
+    <tbody>
+      ${list.map(p=>{
+        const c = customers.find(x=>x.id===p.customerId);
+        return `<tr>
+          ${showName? `<td>${c?escapeHtml(c.name):'-'}</td>`:''}
+          <td>#${p.slipNumber}</td>
+          <td>${p.date}</td>
+          <td>${paymentTypeLabel(p.type)}</td>
+          <td><span class="badge method-${p.method}">${p.method==='cash'?'نقد':'چيڪ'}</span></td>
+          <td>${fmt(p.amount)}</td>
+          <td><button class="btn btn-outline" style="padding:6px 14px;font-size:12.5px;" onclick="viewSlip('${p.id}')">رسيد ڏسو</button></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table>`;
+}
+
+function paymentTypeLabel(t){
+  if(t==='advance') return 'ايڊوانس';
+  if(t==='token') return 'ٽوڪن';
+  return 'قسط';
+}
+
+function viewSlip(paymentId){
+  lastSlipPaymentId = paymentId;
+  const p = payments.find(x=>x.id===paymentId);
+  currentCustomerId = p.customerId;
+  currentView='slip';
+  render();
+}
+
+/* =====================  RENDER: PAY INSTALLMENT  ===================== */
+function renderPayInstallment(){
+  const c = currentCustomerId ? customers.find(x=>x.id===currentCustomerId) : null;
+
+  if(!c){
+    return `
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">قسط ادا ڪريو</h1>
+        <p class="page-sub">پهرين گراهڪ ڳوليو</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="quick-search" style="margin-bottom:10px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="paySearch" placeholder="نالو، سي اين آءِ سي يا پلاٽ نمبر لکو..." oninput="renderPaySearchResults(this.value)" autofocus>
+      </div>
+      <div class="search-results" id="paySearchResults"></div>
+    </div>
+    `;
+  }
+
+  const bal = balanceOf(c);
+  return `
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">قسط ادا ڪريو</h1>
+      <p class="page-sub">گراهڪ: ${escapeHtml(c.name)} — پلاٽ ${escapeHtml(c.plotNumber)}</p>
+    </div>
+    <button class="btn btn-outline" onclick="currentCustomerId=null;render();">🔁 ٻيو گراهڪ چونڊيو</button>
+  </div>
+
+  <div class="card">
+    <div class="info-grid" style="margin-top:0;">
+      <div class="info-item"><div class="k">ڪل رقم</div><div class="v">${fmt(c.totalAmount)}</div></div>
+      <div class="info-item"><div class="k">ادا ٿيل رقم</div><div class="v" style="color:var(--success);">${fmt(totalPaid(c.id))}</div></div>
+      <div class="info-item"><div class="k">باقي رقم</div><div class="v" style="color:var(--maroon);">${fmt(bal)}</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num-badge">﷼</span> نئين ادائيگيءَ جي تفصيل</h2>
+    <div class="form-grid">
+      <div class="field"><label>تاريخ</label><input id="p_date" type="date" value="${todayStr()}"></div>
+      <div class="field">
+        <label>ادائيگيءَ جو قسم</label>
+        <select id="p_type">
+          <option value="installment">قسط</option>
+          <option value="advance">ايڊوانس</option>
+          <option value="token">ٽوڪن</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>ادائيگيءَ جو طريقو</label>
+        <select id="p_method">
+          <option value="cash">نقد</option>
+          <option value="cheque">چيڪ</option>
+        </select>
+      </div>
+      <div class="field"><label>ادا ٿيندڙ رقم</label><input id="p_amount" type="number" min="1" placeholder="مثال: 25000"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="submitPayment('${c.id}')">💾 محفوظ ڪريو ۽ رسيد ٺاهيو</button>
+    </div>
+  </div>
+  `;
+}
+
+function startPayment(id){
+  currentCustomerId = id;
+  currentView='payInstallment';
+  render();
+}
+
+function renderPaySearchResults(val){
+  const box = document.getElementById('paySearchResults');
+  const t = val.trim().toLowerCase();
+  if(!t){ box.innerHTML=''; return; }
+  const hits = customers.filter(c=>
+    (c.name||'').toLowerCase().includes(t) ||
+    (c.cnic||'').toLowerCase().includes(t) ||
+    (c.plotNumber||'').toLowerCase().includes(t)
+  ).slice(0,8);
+  box.innerHTML = hits.length ? hits.map(c=>`
+    <div class="search-hit" onclick="startPayment('${c.id}')">
+      <div><div class="name">${escapeHtml(c.name)}</div><div class="meta">پلاٽ ${escapeHtml(c.plotNumber)} • باقي رقم: ${fmt(balanceOf(c))}</div></div>
+      <span style="color:var(--brass);">←</span>
+    </div>`).join('') : `<div style="color:#8a8370;padding:10px;">ڪو به گراهڪ نه مليو</div>`;
+}
+
+async function submitPayment(cid){
+  const amount = Number(document.getElementById('p_amount').value)||0;
+  if(amount<=0){ showToast('مهرباني ڪري صحيح رقم داخل ڪريو'); return; }
+  const date = document.getElementById('p_date').value || todayStr();
+  const type = document.getElementById('p_type').value;
+  const method = document.getElementById('p_method').value;
+
+  const slipNumber = slipCounter++;
+  await saveSlipCounter();
+  const payment = {id:uid(), customerId:cid, slipNumber, date, amount, method, type, createdAt:Date.now()};
+  payments.push(payment);
+  await savePayments();
+  lastSlipPaymentId = payment.id;
+  showToast('ادائيگي محفوظ ٿي وئي — رسيد تيار آهي');
+  currentCustomerId = cid;
+  currentView='slip';
+  render();
+}
+
+/* =====================  RENDER: SLIP  ===================== */
+function renderSlip(){
+  const p = payments.find(x=>x.id===lastSlipPaymentId) || customerPayments(currentCustomerId)[0];
+  const c = customers.find(x=>x.id===(p? p.customerId : currentCustomerId));
+  if(!c || !p){
+    return `<div class="card">${emptyState('ڪا به رسيد موجود ناهي')}</div>`;
+  }
+  const bal = balanceOf(c);
+
+  return `
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">ادائيگيءَ جي رسيد</h1>
+      <p class="page-sub">رسيد نمبر #${p.slipNumber}</p>
+    </div>
+    <div class="btn-row" style="margin-top:0;">
+      <button class="btn btn-brass" onclick="window.print()">🖨 ڇاپايو</button>
+      <button class="btn btn-outline" onclick="openCustomer('${c.id}')">گراهڪ ڏانهن واپس</button>
+    </div>
+  </div>
+
+  <div class="slip-wrap print-area">
+    <div class="slip">
+      <div class="slip-head">
+        <h2 class="slip-title">سوسائٽي رڪارڊ</h2>
+        <div class="meta">
+          <div><span class="k">رسيد نمبر: </span><span class="v">#${p.slipNumber}</span></div>
+          <div><span class="k">تاريخ: </span>${p.date}</div>
+        </div>
+      </div>
+
+      <div class="slip-section-title">گراهڪ جي معلومات</div>
+      <div class="slip-grid">
+        <div class="row"><span class="k">نالو</span><span class="v">${escapeHtml(c.name)}</span></div>
+        <div class="row"><span class="k">پيءُ جو نالو</span><span class="v">${escapeHtml(c.father)||'-'}</span></div>
+        <div class="row"><span class="k">ذات</span><span class="v">${escapeHtml(c.caste)||'-'}</span></div>
+        <div class="row"><span class="k">شناختي ڪارڊ نمبر</span><span class="v">${escapeHtml(c.cnic)||'-'}</span></div>
+        <div class="row" style="grid-column:span 2;"><span class="k">پتو</span><span class="v">${escapeHtml(c.address)||'-'}</span></div>
+        <div class="row"><span class="k">موبائل نمبر</span><span class="v">${escapeHtml(c.mobile)||'-'}</span></div>
+        <div class="row"><span class="k">پلاٽ نمبر</span><span class="v">${escapeHtml(c.plotNumber)}</span></div>
+      </div>
+
+      <div class="slip-section-title">پلاٽ ۽ رقم جي تفصيل</div>
+      <div class="slip-grid">
+        <div class="row"><span class="k">ڪل ايراضي</span><span class="v">${fmt(c.totalArea)} چو.فوٽ</span></div>
+        <div class="row"><span class="k">في چورس فوٽ اگهه</span><span class="v">${fmt(c.ratePerFt)}</span></div>
+        <div class="row"><span class="k">پلاٽ جي اصل قيمت</span><span class="v">${fmt(c.plotAmount)}</span></div>
+        <div class="row"><span class="k">ترقياتي خرچ (15%)</span><span class="v">${fmt(c.development)}</span></div>
+        <div class="row" style="grid-column:span 2;"><span class="k">ڪل رقم (ترقياتي خرچ سميت)</span><span class="v">${fmt(c.totalAmount)}</span></div>
+      </div>
+
+      <div class="slip-section-title">هن ادائيگيءَ جي تفصيل</div>
+      <div class="slip-grid">
+        <div class="row"><span class="k">ادائيگيءَ جو قسم</span><span class="v">${paymentTypeLabel(p.type)}</span></div>
+        <div class="row"><span class="k">ادائيگيءَ جو طريقو</span><span class="v">${p.method==='cash'?'نقد':'چيڪ'}</span></div>
+        <div class="row"><span class="k">ڪل ادا ٿيل (هن تائين)</span><span class="v">${fmt(totalPaid(c.id))}</span></div>
+        <div class="row"><span class="k">باقي رقم</span><span class="v">${fmt(bal)}</span></div>
+      </div>
+
+      <div class="slip-amount-box">
+        <span class="k">ادا ٿيندڙ رقم</span>
+        <span class="v">${fmt(p.amount)}</span>
+      </div>
+
+      <div class="slip-sign-row">
+        <div class="sign-block">
+          <div class="sign-line"></div>
+          <div class="sign-label">وصول ڪندڙ جو صحيح</div>
+        </div>
+        <div class="sign-block">
+          <div class="stamp-circle">مهر</div>
+          <div class="sign-line"></div>
+          <div class="sign-label">گراهڪ جو صحيح</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+/* =====================  RENDER: ALL PAYMENTS  ===================== */
+function renderAllPayments(){
+  const list = [...payments].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  return `
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">سموريون رسيدون</h1>
+      <p class="page-sub">${fmt(list.length)} ادائيگيون رڪارڊ ٿيل آهن</p>
+    </div>
+  </div>
+  <div class="card">
+    ${list.length ? renderPaymentsTable(list, true) : emptyState('اڃا ڪا به ادائيگي رڪارڊ ناهي ٿي')}
+  </div>
+  `;
+}
+
+/* =====================  UTIL  ===================== */
+function escapeHtml(str){
+  if(str===undefined || str===null) return '';
+  return String(str).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function goto(view){ currentView=view; render(); }
+
+/* =====================  MAIN RENDER  ===================== */
+function render(skipScroll){
+  setActiveNav();
+  let html='';
+  switch(currentView){
+    case 'dashboard': html = renderDashboard(); break;
+    case 'newCustomer': html = renderCustomerForm(); break;
+    case 'customers': html = renderCustomersList(); break;
+    case 'customerDetail': html = renderCustomerDetail(); break;
+    case 'payInstallment': html = renderPayInstallment(); break;
+    case 'slip': html = renderSlip(); break;
+    case 'allPayments': html = renderAllPayments(); break;
+    default: html = renderDashboard();
+  }
+  app.innerHTML = html;
+  if(currentView==='newCustomer'){ updateCalcPreview(); }
+  if(!skipScroll) window.scrollTo(0,0);
+}
+
+/* =====================  INIT  ===================== */
+(async function init(){
+  app.innerHTML = `<div class="empty-state">لوڊ ٿي رهيو آهي...</div>`;
+  await loadState();
+  render();
+})();
+</script>
+</body>
+</html>
